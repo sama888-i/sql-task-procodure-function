@@ -1,0 +1,113 @@
+create dataBase Blog3
+create table Categories(
+Id int primary key identity,
+Name nvarchar(50) not null unique
+
+)
+create table Tags(
+Id int primary key identity,
+Name nvarchar(50) not null unique
+)
+create table Users(
+Id int primary key identity,
+UserName nvarchar(50) not null unique,
+FullName nvarchar(50) not null,
+Age int Check(Age>0 and Age<150)
+)
+create table Blogs(
+Id int primary key Identity,
+Title nvarchar (50),
+[Description] nvarchar not null,
+
+)
+create table Comments(
+Id int primary key Identity ,
+Content nvarchar (250),
+UsersId int foreign key references Users(Id),
+BlogsId int references Blogs(Id)
+
+
+
+)
+Alter table Blogs
+Add UsersId int references Users(Id),
+CategoriesId int references Categories(Id)
+Alter table Blogs
+Alter column [Description] nvarchar(50) not null
+create table BlogTags(
+Id int primary key Identity,
+BlogsId int references Blogs(Id),
+TagsId int references Tags(Id)
+
+)
+insert into Users
+values ('Sema','Ismayilzade',19),
+('Cevahir','Ismayilzade',18),
+('Aysel','Abdullazade',21),
+('Mikayil','Ismayilov',16)
+
+insert into Categories
+values ('Game'),
+('Chess'),
+('Psychology'),
+('Miks')
+
+insert into Tags
+values('#game'),
+('#psycho'),
+('#chess'),
+('#everything')
+
+insert into Blogs
+values('horror game(Granny)','dunyanin en qorxunc oyununu oynadim',4,1),
+('butun sirlar','iyi piskolojiye nasil sahip oluruz',3,4),
+('Sicilya mudafiesi','Najdorf usullari,numuneler ile',1,2),
+('bir gun vlog','15 saat yuxu',2,3)
+select * from Blogs
+Select * from Tags
+insert into BlogTags
+Values(2,1),
+(3,2),
+(4,3),
+(5,4)
+
+insert into Comments 
+values('Davami Gelsin',1,4),
+('Geden 10 deqiqemi geri verin ',3,3),
+('Novbeti videoda expert modu gelsin',4,2),
+('Ilk defe heqiqeti paylasan youtuber gordum ',2,5)
+
+
+
+create view Get_Blog_title_With_User
+As
+Select Blogs.Title,Users.UserName,Users.FullName  From Blogs
+join Users
+on Blogs.UsersId=Users.Id
+select * from Get_Blog_title_With_User 
+create view Get_Blog_title_Category
+As
+Select Blogs.Title ,Categories.Name From Blogs
+join Categories 
+on Blogs.CategoriesId=Categories .Id
+select * From Get_Blog_title_Category 
+
+Create procedure GetComment
+@UserId int
+As
+Select Comments.Content From Comments
+where UsersId=@UserId
+exec GetComment @userId = 3
+
+create function GetBlogCount(@categoryId int)
+returns int
+As
+Begin 
+declare @BlogsCount int
+Select @BlogsCount=Count(*) from Blogs
+where Blogs.CategoriesId =@categoryId
+return @BlogsCount
+end
+
+
+select dbo.GetBlogCount(2) as BlogsCount
